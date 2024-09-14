@@ -1,0 +1,10 @@
+﻿@model IEnumerable<InventoryManagement2.Models.Review>
+
+@foreach (var review in Model)
+{
+    <div class="review">
+        <p class="review-user">@review.UserName</p>
+        <p class="review-comment">@review.Comment</p>
+        <p><small>@review.CreatedDate.ToString("f")</small></p>
+    </div>
+}

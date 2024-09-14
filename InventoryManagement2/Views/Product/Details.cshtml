@@ -1,0 +1,215 @@
+﻿@model InventoryManagement2.Models.Product
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.ProductName - Product Details</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('/images/pexels-pixabay-313563.jpg') no-repeat center center fixed;
+            background-size: cover; 
+            color: black; 
+            font-size: 18px; 
+        }
+
+        .container {
+            width: 80%; 
+            margin: 40px auto;
+            background-color: white;
+            padding: 40px; 
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .product-details {
+            flex: 1;
+            min-width: 400px; 
+        }
+
+            .product-details h1 {
+                margin-bottom: 20px; 
+                font-size: 32px; 
+                color: black; 
+            }
+
+            .product-details p {
+                margin: 10px 0; 
+                font-size: 20px; 
+                color: black; 
+            }
+
+        .product-price {
+            color: #4caf50;
+            font-size: 26px; 
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        h2 {
+            margin-top: 50px; 
+            padding-bottom: 15px; 
+            font-size: 28px; 
+            color: black; 
+            border-bottom: 3px solid #ff5722;
+        }
+
+        .review-section {
+            margin-top: 40px; 
+        }
+
+        .review {
+            padding: 20px 0;
+            border-bottom: 1px solid #ccc; 
+        }
+
+            .review:last-child {
+                border-bottom: none;
+            }
+
+        .review-user {
+            font-weight: bold;
+            color: #ff5722;
+            font-size: 20px; 
+        }
+
+        .review-comment {
+            margin: 10px 0 0 0; 
+            font-size: 18px;
+            color: black; 
+        }
+
+        .review-date {
+            font-size: 1em; 
+            color: #666; 
+        }
+
+        .review-form {
+            margin-top: 40px; 
+            padding: 25px; 
+            background-color: white; 
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+            .review-form div {
+                margin-bottom: 25px; 
+            }
+
+            .review-form label {
+                display: block;
+                margin-bottom: 10px; 
+                font-weight: bold;
+                color: black; 
+                font-size: 18px; 
+            }
+
+            .review-form input[type="text"],
+            .review-form textarea {
+                width: 100%;
+                padding: 14px; 
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                background-color: #f9f9f9; 
+                color: black; 
+                font-size: 18px; 
+            }
+
+            .review-form button {
+                background-color: #ff5722;
+                color: white;
+                border: none;
+                padding: 14px 30px; 
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 18px; 
+            }
+
+                .review-form button:hover {
+                    background-color: #e64a19;
+                }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Product Details Section -->
+        <div class="product-container">
+            <div class="product-details">
+                <h1>@Model.ProductName</h1>
+                <p><strong>Description:</strong> @Model.Description</p>
+                <p><strong>Stock Available:</strong> @Model.Stock</p>
+                <p><strong>Manufacturing Date:</strong> @Model.ManufacturingDate.ToString("MMMM dd, yyyy")</p>
+                <p class="product-price">Price: Rs. @Model.Price.ToString("0.00")</p>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <h2>Customer Reviews</h2>
+        <div class="review-section">
+            @if (Model.Reviews != null && Model.Reviews.Count > 0)
+            {
+                @foreach (var review in Model.Reviews)
+
+                {
+                    <div class="review">
+                        <span class="review-user">@review.UserName</span>
+                        <p class="review-comment">@review.Comment</p>
+                        <p class="review-date">@review.CreatedDate.ToString("f")</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No reviews yet. Be the first to review this product!</p>
+            }
+        </div>
+
+        <!-- Add a Review Form -->
+        <h2>Add Your Review</h2>
+        <form id="review-form" class="review-form" method="post" action="@Url.Action("AddReview", "Product")">
+            <input type="hidden" name="ProductId" value="@Model.Id" />
+            <div>
+                <label for="UserName">Name:</label>
+                <input type="text" id="UserName" name="UserName" required />
+            </div>
+            <div>
+                <label for="Comment">Comment:</label>
+                <textarea id="Comment" name="Comment" rows="4" required></textarea>
+            </div>
+            <button type="submit">Submit Review</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#review-form').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function(result) {
+                        $('#reviews-container').html(result);
+                        $('#review-form')[0].reset();
+                    },
+                    error: function(xhr) {
+                        alert('Error: ' + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
